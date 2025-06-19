@@ -1,0 +1,20 @@
+BMW,7 Series,2023,Gasoline,155.0,86000.0,false
+Mercedes-Benz,S-Class,2023,Gasoline,155.0,111000.0,false
+Audi,A8,2023,Gasoline,155.0,89000.0,false
+Porsche,Panamera,2023,Hybrid,180.0,95000.0,false
+Bentley,Continental GT,2023,Gasoline,198.0,220000.0,false
+Rolls-Royce,Ghost,2023,Gasoline,155.0,315000.0,false
+Lamborghini,Huracan,2023,Gasoline,202.0,240000.0,false
+Ferrari,Portofino,2023,Gasoline,199.0,215000.0,false
+Tesla,Model S,2023,Electric,200.0,100000.0,true
+Lucid,Air,2023,Electric,168.0,95000.0,true
+Aston Martin,DB11,2023,Gasoline,200.0,205000.0,false
+Maserati,Quattroporte,2023,Gasoline,180.0,110000.0,false
+Genesis,G90,2023,Gasoline,145.0,78000.0,false
+Jaguar,XJ,2023,Gasoline,155.0,86000.0,false
+Maybach,GLS 600,2023,Gasoline,155.0,160000.0,false
+Tesla,Model X,2023,Electric,163.0,110000.0,true
+Porsche,Taycan,2023,Electric,161.0,105000.0,true
+Lucid,Air Touring,2023,Electric,155.0,87000.0,true
+BMW,i7,2023,Electric,149.0,120000.0,true
+Mercedes-Benz,EQS,2023,Electric,155.0,102000.0,true
