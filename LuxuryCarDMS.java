@@ -4,14 +4,36 @@ import java.io.*;
 public class LuxuryCarDMS {
     private List<Car> carList = new ArrayList<>();
     private float taxRate;
+    private int nextId = 1;
 
     // Constructor
     public LuxuryCarDMS(float taxRate) {
         this.taxRate = taxRate;
     }
 
+    public List<Car> loadCarsFromFile(String filename) {
+        List<Car> loadedCars = new ArrayList<>();
+        try (Scanner fileScanner = new Scanner(new File(filename))) {
+            while (fileScanner.hasNextLine()) {
+                String[] data = fileScanner.nextLine().split(",");
+                if (data.length == 7) {
+                    Car car = new Car(data[0], data[1], Integer.parseInt(data[2]),
+                            data[3], Float.parseFloat(data[4]),
+                            Float.parseFloat(data[5]), Boolean.parseBoolean(data[6]));
+                    car.setId(nextId++);
+                    carList.add(car);
+                    loadedCars.add(car);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading file: " + e.getMessage());
+        }
+        return loadedCars;
+    }
+
     // Add a new car to the system
     public boolean addCar(Car car) {
+        car.setId(nextId++);
         return carList.add(car);
     }
 
@@ -21,66 +43,55 @@ public class LuxuryCarDMS {
     }
 
     // Remove a car from the system
-    public boolean removeCar(Car car) {
-        return carList.remove(car);
+    public boolean removeCarById(int id) {
+        return carList.removeIf(car -> car.getId() == id);
     }
 
     // Update an existing car's details
-    public boolean updateCarInfo(Car car, String updatedDetails) {
-        if (!carList.contains(car)) return false;
-        String[] parts = updatedDetails.split(",");
-        if (parts.length != 7) return false;
-        try {
-            return car.setDetails(
-                    parts[0].trim(),
-                    parts[1].trim(),
-                    Integer.parseInt(parts[2].trim()),
-                    parts[3].trim(),
-                    Float.parseFloat(parts[4].trim()),
-                    Float.parseFloat(parts[5].trim()),
-                    Boolean.parseBoolean(parts[6].trim())
-            );
-        } catch (Exception e) {
-            return false;
+    public boolean updateCarInfo(int id, Car updatedData) {
+        for (Car car : carList) {
+            if (car.getId() == id) {
+                return car.setDetails(
+                        updatedData.getMake(), updatedData.getModel(), updatedData.getYear(),
+                        updatedData.getEngineType(), updatedData.getTopSpeed(),
+                        updatedData.getBasePrice(), updatedData.getIsElectric());
+            }
         }
+        return false;
+    }
+    // Get most expensive car with tax
+    public String showMostExpensiveWithTax() {
+        if (carList.isEmpty()) return "No cars available.";
+
+        Car mostExpensive = Collections.max(carList, Comparator.comparing(Car::getBasePrice));
+        float finalPrice = mostExpensive.getBasePrice() * (1 + taxRate);
+        return String.format("Most Expensive Car: %s\nPrice with tax: $%.2f",
+                mostExpensive.getDetails(), finalPrice);
+    }
+    // Return the most expensive car
+    public Car getMostExpensiveCar() {
+        if (carList.isEmpty()) return null;
+
+        Car max = carList.get(0);
+        for (Car c : carList) {
+            if (c.getBasePrice() > max.getBasePrice()) {
+                max = c;
+            }
+        }
+        return max;
     }
 
-    // Calculate final price with tax
-    public float calculateFinalPrice(Car car) {
+    // Calculate price with tax
+    public float calculatePriceWithTax(Car car) {
         return car.getBasePrice() * (1 + taxRate);
     }
 
-    // Load cars from a file
-    public void loadFromFile(String filePath) {
-        try (Scanner scanner = new Scanner(new File(filePath))) {
-            while (scanner.hasNextLine()) {
-                String[] parts = scanner.nextLine().split(",");
-                if (parts.length == 7) {
-                    addCar(new Car(
-                            parts[0].trim(),
-                            parts[1].trim(),
-                            Integer.parseInt(parts[2].trim()),
-                            parts[3].trim(),
-                            Float.parseFloat(parts[4].trim()),
-                            Float.parseFloat(parts[5].trim()),
-                            Boolean.parseBoolean(parts[6].trim())
-                    ));
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error loading file: " + e.getMessage());
+    public Car getCarById(int id) {
+        for (Car car : carList) {
+            if (car.getId() == id) return car;
         }
-    }
-
-    // Get most expensive car with tax
-    public void showMostExpensiveWithTax() {
-        if (carList.isEmpty()) {
-            System.out.println("No cars in inventory.");
-            return;
-        }
-        Car max = Collections.max(carList, Comparator.comparing(Car::getBasePrice));
-        System.out.println("Most expensive car: " + max.getDetails());
-        System.out.println("Price with tax: $" + calculateFinalPrice(max));
+        return null;
     }
 }
+
 

@@ -1,13 +1,13 @@
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        LuxuryCarDMS dms = new LuxuryCarDMS(0.1f); // 10% tax
-
+        LuxuryCarDMS dms = new LuxuryCarDMS(0.10f); // 10% tax
+        // Display the menu
         while (true) {
-            // Display the menu
-            System.out.println("\nLuxury Car DMS Menu:");
+            System.out.println("\nLuxury Car DMS Menu");
             System.out.println("1. Load cars from file");
             System.out.println("2. Display all cars");
             System.out.println("3. Add a new car");
@@ -17,58 +17,106 @@ public class Main {
             System.out.println("7. Exit");
             System.out.print("Choose an option: ");
 
-            String input = scanner.nextLine();
-            switch (input) {
+            String choice = scanner.nextLine();
+
+            switch (choice) {
                 case "1":
                     System.out.print("Enter file path: ");
-                    dms.loadFromFile(scanner.nextLine());
-                    break;
-                case "2":
-                    for (Car car : dms.viewCars()) {
-                        System.out.println(car.getDetails());
-                    }
-                    break;
-                case "3":
+                    String filePath = scanner.nextLine();
                     try {
-                        System.out.print("Enter make, model, year, engine type, top speed, base price, is electric (true/false): ");
-                        String[] parts = scanner.nextLine().split(",");
-                        if (parts.length != 7) throw new Exception();
-                        Car car = new Car(parts[0].trim(), parts[1].trim(), Integer.parseInt(parts[2].trim()), parts[3].trim(),
-                                Float.parseFloat(parts[4].trim()), Float.parseFloat(parts[5].trim()), Boolean.parseBoolean(parts[6].trim()));
-                        dms.addCar(car);
-                        System.out.println("Car added successfully.");
+                        List<Car> loaded = dms.loadCarsFromFile(filePath);
+                        System.out.println("Loaded " + loaded.size() + " cars from file.");
                     } catch (Exception e) {
-                        System.out.println("Invalid input. Try again.");
+                        System.out.println("Error: File not found.");
                     }
                     break;
-                case "4":
-                    System.out.print("Enter make of car to update: ");
-                    String makeToUpdate = scanner.nextLine();
-                    for (Car car : dms.viewCars()) {
-                        if (car.getMake().equalsIgnoreCase(makeToUpdate)) {
-                            System.out.print("Enter updated details (make, model, year, engine type, top speed, base price, is electric): ");
-                            if (dms.updateCarInfo(car, scanner.nextLine()))
-                                System.out.println("Car updated.");
-                            else
-                                System.out.println("Update failed.");
+
+                case "2":
+                    List<Car> cars = dms.viewCars();
+                    if (cars.isEmpty()) {
+                        System.out.println("No cars in inventory.");
+                    } else {
+                        for (Car c : cars) {
+                            System.out.println(c.getDetails());
                         }
                     }
                     break;
+
+                case "3":
+                    try {
+                        System.out.print("Enter make: ");
+                        String make = scanner.nextLine();
+                        System.out.print("Enter model: ");
+                        String model = scanner.nextLine();
+                        System.out.print("Enter year: ");
+                        int year = Integer.parseInt(scanner.nextLine());
+                        System.out.print("Enter engine type: ");
+                        String engine = scanner.nextLine();
+                        System.out.print("Enter top speed (mph): ");
+                        float speed = Float.parseFloat(scanner.nextLine());
+                        System.out.print("Enter base price: ");
+                        float price = Float.parseFloat(scanner.nextLine());
+                        System.out.print("Is it electric (true/false): ");
+                        boolean isElectric = Boolean.parseBoolean(scanner.nextLine());
+
+                        Car newCar = new Car(make, model, year, engine, speed, price, isElectric);
+                        dms.addCar(newCar);
+                        System.out.println("Car added successfully.");
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Please try again.");
+                    }
+                    break;
+
+                case "4":
+                    try {
+                        System.out.print("Enter ID of car to update: ");
+                        int updateId = Integer.parseInt(scanner.nextLine());
+                        System.out.print("Enter new make: ");
+                        String newMake = scanner.nextLine();
+                        System.out.print("Enter new model: ");
+                        String newModel = scanner.nextLine();
+                        System.out.print("Enter new year: ");
+                        int newYear = Integer.parseInt(scanner.nextLine());
+                        System.out.print("Enter new engine type: ");
+                        String newEngine = scanner.nextLine();
+                        System.out.print("Enter new top speed: ");
+                        float newSpeed = Float.parseFloat(scanner.nextLine());
+                        System.out.print("Enter new base price: ");
+                        float newPrice = Float.parseFloat(scanner.nextLine());
+                        System.out.print("Is it electric (true/false): ");
+                        boolean newIsElectric = Boolean.parseBoolean(scanner.nextLine());
+
+                        Car updatedData = new Car(newMake, newModel, newYear, newEngine, newSpeed, newPrice, newIsElectric);
+                        boolean updated = dms.updateCarInfo(updateId, updatedData);
+                        System.out.println(updated ? "Car updated." : "Car with given ID not found.");
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Update failed.");
+                    }
+                    break;
+
                 case "5":
-                    System.out.print("Enter make of car to remove: ");
-                    String makeToRemove = scanner.nextLine();
-                    dms.viewCars().removeIf(car -> car.getMake().equalsIgnoreCase(makeToRemove));
-                    System.out.println("Car removed if it existed.");
+                    try {
+                        System.out.print("Enter ID of car to remove: ");
+                        int removeId = Integer.parseInt(scanner.nextLine());
+                        boolean removed = dms.removeCarById(removeId);
+                        System.out.println(removed ? "Car removed." : "Car with given ID not found.");
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Removal failed.");
+                    }
                     break;
+
                 case "6":
-                    dms.showMostExpensiveWithTax();
+                    System.out.println(dms.showMostExpensiveWithTax());
                     break;
+
                 case "7":
                     System.out.println("Exiting...");
                     return;
+
                 default:
                     System.out.println("Invalid option.");
             }
         }
     }
 }
+
