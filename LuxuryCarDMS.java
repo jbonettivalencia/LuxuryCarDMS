@@ -59,6 +59,7 @@ public class LuxuryCarDMS {
         }
         return false;
     }
+
     // Get most expensive car with tax
     public String showMostExpensiveWithTax() {
         if (carList.isEmpty()) return "No cars available.";
@@ -68,6 +69,7 @@ public class LuxuryCarDMS {
         return String.format("Most Expensive Car: %s\nPrice with tax: $%.2f",
                 mostExpensive.getDetails(), finalPrice);
     }
+
     // Return the most expensive car
     public Car getMostExpensiveCar() {
         if (carList.isEmpty()) return null;
@@ -86,11 +88,17 @@ public class LuxuryCarDMS {
         return car.getBasePrice() * (1 + taxRate);
     }
 
+    // Get a car by its ID
     public Car getCarById(int id) {
         for (Car car : carList) {
             if (car.getId() == id) return car;
         }
         return null;
+    }
+
+    // Getter for taxRate
+    public float getTaxRate() {
+        return taxRate;
     }
 }
 

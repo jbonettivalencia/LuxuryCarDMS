@@ -4,7 +4,7 @@ public class Car {
     private String make, model, engineType;
     private int year;
     private float topSpeed, basePrice;
-    private boolean isElectric;
+    public boolean isElectric;
 
     // Constructor
     public Car(String make, String model, int year, String engineType,
