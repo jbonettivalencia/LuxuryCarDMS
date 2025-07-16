@@ -1,50 +1,47 @@
 public class Car {
-    // Car attributes
     private int id;
-    private String make, model, engineType;
+    private String make;
+    private String model;
     private int year;
-    private float topSpeed, basePrice;
-    public boolean isElectric;
+    private String fuelType;
+    private double topSpeed;
+    private double price;
+    private boolean isElectric;
 
-    // Constructor
-    public Car(String make, String model, int year, String engineType,
-               float topSpeed, float basePrice, boolean isElectric) {
+    public Car(String make, String model, int year, String fuelType, double topSpeed, double price, boolean isElectric) {
         this.make = make;
         this.model = model;
         this.year = year;
-        this.engineType = engineType;
+        this.fuelType = fuelType;
         this.topSpeed = topSpeed;
-        this.basePrice = basePrice;
+        this.price = price;
         this.isElectric = isElectric;
     }
 
-    // Update car details
-    public boolean setDetails(String make, String model, int year, String engineType,
-                              float topSpeed, float basePrice, boolean isElectric) {
-        this.make = make;
-        this.model = model;
-        this.year = year;
-        this.engineType = engineType;
-        this.topSpeed = topSpeed;
-        this.basePrice = basePrice;
-        this.isElectric = isElectric;
-        return true;
-    }
-    // Get car details
-    public String getDetails() {
-        return String.format("[%d] %s %s (%d) - %s, %.1f mph, $%.2f, %s",
-                id, make, model, year, engineType, topSpeed, basePrice,
-                isElectric ? "Electric" : "Gasoline");
-    }
-
-    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
     public String getMake() { return make; }
     public String getModel() { return model; }
     public int getYear() { return year; }
-    public String getEngineType() { return engineType; }
-    public float getTopSpeed() { return topSpeed; }
-    public float getBasePrice() { return basePrice; }
-    public boolean getIsElectric() { return isElectric; }
+    public String getFuelType() { return fuelType; }
+    public double getTopSpeed() { return topSpeed; }
+    public double getPrice() { return price; }
+    public boolean isElectric() { return isElectric; }
+
+    public void setMake(String make) { this.make = make; }
+    public void setModel(String model) { this.model = model; }
+    public void setYear(int year) { this.year = year; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+    public void setTopSpeed(double topSpeed) { this.topSpeed = topSpeed; }
+    public void setPrice(double price) { this.price = price; }
+    public void setElectric(boolean electric) { isElectric = electric; }
+
+    public String getDetails() {
+        return String.format(
+                "ID: %d | %s %s | Year: %d | Fuel: %s | Top Speed: %.1f mph | Price: $%.2f | Electric: %s",
+                id, make, model, year, fuelType, topSpeed, price, isElectric ? "Yes" : "No"
+        );
+    }
+
 }

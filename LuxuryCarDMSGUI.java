@@ -1,155 +1,158 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.event.*;
+import java.sql.SQLException;
+import java.util.List;
 
-public class LuxuryCarDMSGUI {
-    private LuxuryCarDMS dms;
-    private JFrame frame;
-    private JTable table;
-    private DefaultTableModel tableModel;
+public class LuxuryCarDMSGUI extends JFrame {
+    private DatabaseManager dbManager;
 
     public LuxuryCarDMSGUI() {
-        dms = new LuxuryCarDMS(0.10f);  // 10% tax rate
-        initGUI();
+        String dbPath = JOptionPane.showInputDialog("Enter database file name (e.g., cars.db):");
+        dbManager = new DatabaseManager(dbPath);
+
+        JButton displayCarsButton = new JButton("Display Cars");
+        JButton addCarButton = new JButton("Add Car");
+        JButton deleteCarButton = new JButton("Delete Car");
+        JButton updateCarButton = new JButton("Update Car");
+        JButton customFeatureButton = new JButton("Show Most Expensive Car (+Tax)");
+
+        JTextArea displayArea = new JTextArea(20, 60);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
+
+        displayCarsButton.addActionListener(e -> displayCars(displayArea));
+        addCarButton.addActionListener(e -> addCar(displayArea));
+        deleteCarButton.addActionListener(e -> deleteCar(displayArea));
+        updateCarButton.addActionListener(e -> updateCar(displayArea));
+        customFeatureButton.addActionListener(e -> showMostExpensiveCar(displayArea));
+
+        JPanel panel = new JPanel();
+        panel.add(displayCarsButton);
+        panel.add(addCarButton);
+        panel.add(deleteCarButton);
+        panel.add(updateCarButton);
+        panel.add(customFeatureButton);
+
+        add(panel, "North");
+        add(scrollPane, "Center");
+
+        setTitle("Luxury Car DMS");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        pack();
+        setVisible(true);
     }
 
-    private void initGUI() {
-        frame = new JFrame("Luxury Car DMS");
-        frame.setSize(1000, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-
-        // Table Setup
-        tableModel = new DefaultTableModel(new String[]{
-                "ID", "Make", "Model", "Year", "Engine Type",
-                "Top Speed", "Base Price", "Is Electric"
-        }, 0);
-        table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-        frame.add(scrollPane, BorderLayout.CENTER);
-
-        // Buttons
-        JPanel buttonPanel = new JPanel();
-
-        JButton loadButton = new JButton("Load from File");
-        loadButton.addActionListener(e -> loadCarsFromFile());
-
-        JButton addButton = new JButton("Add Car");
-        addButton.addActionListener(e -> addCar());
-
-        JButton updateButton = new JButton("Update Car");
-        updateButton.addActionListener(e -> updateCar());
-
-        JButton removeButton = new JButton("Remove Car");
-        removeButton.addActionListener(e -> removeCar());
-
-        JButton mostExpensiveButton = new JButton("Most Expensive Car with Tax");
-        mostExpensiveButton.addActionListener(e -> showMostExpensive());
-
-        buttonPanel.add(loadButton);
-        buttonPanel.add(addButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(removeButton);
-        buttonPanel.add(mostExpensiveButton);
-
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-        frame.setVisible(true);
-    }
-
-    private void refreshTable() {
-        tableModel.setRowCount(0);
-        for (Car car : dms.viewCars()) {
-            tableModel.addRow(new Object[]{
-                    car.getId(), car.getMake(), car.getModel(), car.getYear(),
-                    car.getEngineType(), car.getTopSpeed(),
-                    car.getBasePrice(), car.getIsElectric()
-            });
-        }
-    }
-
-    private void loadCarsFromFile() {
+    private void displayCars(JTextArea displayArea) {
         try {
-            dms.loadCarsFromFile("cars.txt");
-            refreshTable();
-            JOptionPane.showMessageDialog(frame, "Cars loaded successfully.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Failed to load cars: " + e.getMessage());
-        }
-    }
-
-    private void addCar() {
-        try {
-            String make = JOptionPane.showInputDialog("Enter make:");
-            String model = JOptionPane.showInputDialog("Enter model:");
-            int year = Integer.parseInt(JOptionPane.showInputDialog("Enter year:"));
-            String engineType = JOptionPane.showInputDialog("Enter engine type:");
-            float topSpeed = Float.parseFloat(JOptionPane.showInputDialog("Enter top speed:"));
-            float basePrice = Float.parseFloat(JOptionPane.showInputDialog("Enter base price:"));
-            boolean isElectric = Boolean.parseBoolean(JOptionPane.showInputDialog("Is electric (true/false):"));
-
-            Car newCar = new Car(make, model, year, engineType, topSpeed, basePrice, isElectric);
-            dms.addCar(newCar);
-            refreshTable();
-            JOptionPane.showMessageDialog(frame, "Car added successfully.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Error adding car: " + e.getMessage());
-        }
-    }
-
-    private void updateCar() {
-        try {
-            int id = Integer.parseInt(JOptionPane.showInputDialog("Enter ID of car to update:"));
-            String make = JOptionPane.showInputDialog("Enter new make:");
-            String model = JOptionPane.showInputDialog("Enter new model:");
-            int year = Integer.parseInt(JOptionPane.showInputDialog("Enter new year:"));
-            String engineType = JOptionPane.showInputDialog("Enter new engine type:");
-            float topSpeed = Float.parseFloat(JOptionPane.showInputDialog("Enter new top speed:"));
-            float basePrice = Float.parseFloat(JOptionPane.showInputDialog("Enter new base price:"));
-            boolean isElectric = Boolean.parseBoolean(JOptionPane.showInputDialog("Is electric (true/false):"));
-
-            Car updatedCar = new Car(make, model, year, engineType, topSpeed, basePrice, isElectric);
-            boolean success = dms.updateCarInfo(id, updatedCar);
-
-            if (success) {
-                refreshTable();
-                JOptionPane.showMessageDialog(frame, "Car updated successfully.");
-            } else {
-                JOptionPane.showMessageDialog(frame, "Car with ID " + id + " not found.");
+            List<Car> cars = dbManager.loadCars();
+            displayArea.setText("");
+            for (Car car : cars) {
+                displayArea.append(car.getDetails() + "\n");
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Error updating car: " + e.getMessage());
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading cars.");
         }
     }
 
-    private void removeCar() {
+    private void addCar(JTextArea displayArea) {
         try {
-            int id = Integer.parseInt(JOptionPane.showInputDialog("Enter ID of car to remove:"));
-            boolean removed = dms.removeCarById(id);
-            if (removed) {
-                refreshTable();
-                JOptionPane.showMessageDialog(frame, "Car removed successfully.");
-            } else {
-                JOptionPane.showMessageDialog(frame, "Car with ID " + id + " not found.");
-            }
+            String make = inputString("Enter Make:");
+            String model = inputString("Enter Model:");
+            int year = inputInt("Enter Year:");
+            String fuelType = inputString("Enter Fuel Type:");
+            double topSpeed = inputDouble("Enter Top Speed:");
+            double price = inputDouble("Enter Price:");
+            boolean isElectric = JOptionPane.showConfirmDialog(this, "Is it electric?", "Electric", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+
+            Car car = new Car(make, model, year, fuelType, topSpeed, price, isElectric);
+            dbManager.addCar(car);
+            JOptionPane.showMessageDialog(this, "Car added successfully!");
+
+            displayCars(displayArea);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Error removing car: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error adding car.");
         }
     }
 
-    private void showMostExpensive() {
-        Car car = dms.getMostExpensiveCar();
-        if (car != null) {
-            float priceWithTax = dms.calculatePriceWithTax(car);
-            JOptionPane.showMessageDialog(frame,
-                    "Most Expensive Car: " + car.getDetails() +
-                            "\nPrice with tax: $" + String.format("%.2f", priceWithTax));
-        } else {
-            JOptionPane.showMessageDialog(frame, "No cars in system.");
+    private void deleteCar(JTextArea displayArea) {
+        try {
+            int id = inputInt("Enter ID of car to delete:");
+            dbManager.deleteCar(id);
+            JOptionPane.showMessageDialog(this, "Car deleted successfully!");
+
+            displayCars(displayArea);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error deleting car.");
         }
     }
 
-    // Entry point launch GUI
+    private void updateCar(JTextArea displayArea) {
+        try {
+            int id = inputInt("Enter ID of car to update:");
+            String make = inputString("Enter New Make:");
+            String model = inputString("Enter New Model:");
+            int year = inputInt("Enter New Year:");
+            String fuelType = inputString("Enter New Fuel Type:");
+            double topSpeed = inputDouble("Enter New Top Speed:");
+            double price = inputDouble("Enter New Price:");
+            boolean isElectric = JOptionPane.showConfirmDialog(this, "Is it electric?", "Electric", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+
+            Car car = new Car(make, model, year, fuelType, topSpeed, price, isElectric);
+            car.setId(id);
+            dbManager.updateCar(car);
+
+            JOptionPane.showMessageDialog(this, "Car updated successfully!");
+
+            displayCars(displayArea);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error updating car.");
+        }
+    }
+
+    private void showMostExpensiveCar(JTextArea displayArea) {
+        try {
+            Car car = dbManager.getMostExpensiveCar();
+            if (car != null) {
+                double tax = car.getPrice() * 0.10;
+                double total = car.getPrice() + tax;
+                displayArea.setText("Most Expensive Car:\n" + car.getDetails() + "\nPrice with 10% tax: $" + String.format("%.2f", total));
+            } else {
+                displayArea.setText("No cars found.");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error calculating most expensive car.");
+        }
+    }
+
+    // Simple input validation methods
+    private String inputString(String message) {
+        String input;
+        do {
+            input = JOptionPane.showInputDialog(message);
+        } while (input == null || input.trim().isEmpty());
+        return input.trim();
+    }
+
+    private int inputInt(String message) {
+        while (true) {
+            try {
+                return Integer.parseInt(inputString(message));
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid integer input.");
+            }
+        }
+    }
+
+    private double inputDouble(String message) {
+        while (true) {
+            try {
+                return Double.parseDouble(inputString(message));
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid decimal input.");
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new LuxuryCarDMSGUI());
+        new LuxuryCarDMSGUI();
     }
 }
