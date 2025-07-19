@@ -1,3 +1,7 @@
+/**
+ * Represents a luxury car in the inventory system.
+ * Holds all car details.
+ */
 public class Car {
     private int id;
     private String make;
@@ -7,7 +11,16 @@ public class Car {
     private double topSpeed;
     private double price;
     private boolean isElectric;
-
+    /**
+     * Constructs a new Car object.
+     * @param make The make of the car.
+     * @param model The model of the car.
+     * @param year The production year.
+     * @param fuelType The fuel type.
+     * @param topSpeed The top speed in mph.
+     * @param price The price in USD.
+     * @param isElectric if the car is electric or not.
+     */
     public Car(String make, String model, int year, String fuelType, double topSpeed, double price, boolean isElectric) {
         this.make = make;
         this.model = model;
@@ -17,8 +30,9 @@ public class Car {
         this.price = price;
         this.isElectric = isElectric;
     }
-
+    /** @return The car's database ID. */
     public int getId() { return id; }
+    /** @param id Set the database ID. */
     public void setId(int id) { this.id = id; }
 
     public String getMake() { return make; }

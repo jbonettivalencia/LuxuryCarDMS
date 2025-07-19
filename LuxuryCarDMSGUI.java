@@ -2,10 +2,17 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.List;
-
+/**
+ * LuxuryCarDMSGUI provides the gui for the Luxury Car Management System.
+ * It allows the user to perform CRUD operations and display the most expensive car with tax.
+ * Users interact with buttons to manage the inventory of luxury cars.
+ */
 public class LuxuryCarDMSGUI extends JFrame {
     private DatabaseManager dbManager;
-
+    /**
+     * Constructs the LuxuryCarDMSGUI, initializing the database connection
+     * and setting up the GUI components.
+     */
     public LuxuryCarDMSGUI() {
         String dbPath = JOptionPane.showInputDialog("Enter database file name (e.g., cars.db):");
         dbManager = new DatabaseManager(dbPath);
@@ -40,7 +47,11 @@ public class LuxuryCarDMSGUI extends JFrame {
         pack();
         setVisible(true);
     }
-
+    /**
+     * Displays the list of cars currently in the database using a message dialog.
+     *
+     * @param displayArea caused when the button is clicked.
+     */
     private void displayCars(JTextArea displayArea) {
         try {
             List<Car> cars = dbManager.loadCars();
@@ -52,7 +63,11 @@ public class LuxuryCarDMSGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error loading cars.");
         }
     }
-
+    /**
+     * Allows the user to add a new car to the database through input dialogs.
+     *
+     * @param displayArea caused when the button is clicked
+     */
     private void addCar(JTextArea displayArea) {
         try {
             String make = inputString("Enter Make:");
@@ -72,7 +87,11 @@ public class LuxuryCarDMSGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error adding car.");
         }
     }
-
+    /**
+     * Allows the user to delete a car by entering its ID.
+     *
+     * @param displayArea caused when the button is clicked.
+     */
     private void deleteCar(JTextArea displayArea) {
         try {
             int id = inputInt("Enter ID of car to delete:");
@@ -84,7 +103,11 @@ public class LuxuryCarDMSGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error deleting car.");
         }
     }
-
+    /**
+     * Allows the user to update an existing car by entering new details.
+     *
+     * @param displayArea caused when the button is clicked.
+     */
     private void updateCar(JTextArea displayArea) {
         try {
             int id = inputInt("Enter ID of car to update:");
@@ -107,7 +130,11 @@ public class LuxuryCarDMSGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error updating car.");
         }
     }
-
+    /**
+     * Displays the most expensive car with its total price including tax.
+     *
+     * @param displayArea caused when the button is clicked.
+     */
     private void showMostExpensiveCar(JTextArea displayArea) {
         try {
             Car car = dbManager.getMostExpensiveCar();
@@ -123,7 +150,12 @@ public class LuxuryCarDMSGUI extends JFrame {
         }
     }
 
-    // Simple input validation methods
+    /**
+     * Input validation method
+     *
+     * @param message The prompt message
+     * @return The entered String value
+     */
     private String inputString(String message) {
         String input;
         do {
@@ -131,7 +163,12 @@ public class LuxuryCarDMSGUI extends JFrame {
         } while (input == null || input.trim().isEmpty());
         return input.trim();
     }
-
+    /**
+     * Input validation method
+     *
+     * @param message The prompt message.
+     * @return The entered integer.
+     */
     private int inputInt(String message) {
         while (true) {
             try {
@@ -141,7 +178,12 @@ public class LuxuryCarDMSGUI extends JFrame {
             }
         }
     }
-
+    /**
+     * Input validation method
+     *
+     * @param message The prompt message
+     * @return The entered double value.
+     */
     private double inputDouble(String message) {
         while (true) {
             try {
@@ -151,6 +193,11 @@ public class LuxuryCarDMSGUI extends JFrame {
             }
         }
     }
+    /**
+     * Launches GUI application.
+     *
+     * @param args Command-line arguments (not used).
+     */
 
     public static void main(String[] args) {
         new LuxuryCarDMSGUI();

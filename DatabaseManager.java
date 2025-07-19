@@ -1,18 +1,38 @@
+/**
+ * DatabaseManager handles all SQL database operations,
+ * including connecting to the database and performs CRUD actions.
+ * This class does the database handling from the GUI and main logic.
+ */
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
+    /** Path to the SQL database. */
     private String databasePath;
-
+    /**
+     * Constructs a DatabaseManager with the provided database path.
+     *
+     * @param databasePath the path to the SQL database
+     */
     public DatabaseManager(String databasePath) {
         this.databasePath = databasePath;
     }
-
+    /**
+     * Attempts to connect to the SQL database.
+     *
+     * @return an active connection to the database
+     * @throws SQLException if a database access error occurs
+     */
     private Connection connect() throws SQLException {
         return DriverManager.getConnection("jdbc:sqlite:" + databasePath);
     }
-
+    /**
+     * Loads all cars from the database.
+     *
+     * @return a List of Car objects populated from the database
+     * @throws SQLException if a database error occurs
+     */
     public List<Car> loadCars() throws SQLException {
         List<Car> cars = new ArrayList<>();
         String sql = "SELECT * FROM cars";
@@ -38,7 +58,12 @@ public class DatabaseManager {
 
         return cars;
     }
-
+    /**
+     * Adds a new Car record to the database.
+     *
+     * @param car the Car object to be inserted
+     * @throws SQLException if a database insert error
+     */
     public void addCar(Car car) throws SQLException {
         String sql = "INSERT INTO cars(make, model, year, fuelType, topSpeed, price, isElectric) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect();
@@ -54,7 +79,12 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-
+    /**
+     * Updates an existing Car in the database.
+     *
+     * @param car the Car object containing updated values
+     * @throws SQLException if a database update error occurs
+     */
     public void updateCar(Car car) throws SQLException {
         String sql = "UPDATE cars SET make=?, model=?, year=?, fuelType=?, topSpeed=?, price=?, isElectric=? WHERE id=?";
         try (Connection conn = connect();
@@ -71,7 +101,12 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-
+    /**
+     * Deletes a Car record from the database by its ID.
+     *
+     * @param carId the unique ID of the Car to delete
+     * @throws SQLException if a database deletion error occurs
+     */
     public void deleteCar(int carId) throws SQLException {
         String sql = "DELETE FROM cars WHERE id=?";
         try (Connection conn = connect();
